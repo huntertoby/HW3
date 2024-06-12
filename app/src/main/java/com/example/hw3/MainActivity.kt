@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -39,6 +40,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.hw3.ui.theme.HW3Theme
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -76,15 +78,6 @@ fun BlurImage(modifier: Modifier = Modifier) {
     var hasCameraPermission by remember { mutableStateOf(false) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
-
-
-    val pickImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            imageBitmap = getBitmapFromUri(context, it)
-        }
-    }
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
@@ -156,16 +149,6 @@ fun BlurImage(modifier: Modifier = Modifier) {
                 ) {
                     Text(text = "Take a picture")
                 }
-                Button(
-                    onClick = {
-                        pickImageLauncher.launch("image/*")
-                    },
-                    Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp)
-                ) {
-                    Text(text = "Choose a picture")
-                }
             }
             Button(
                 onClick = {
@@ -191,12 +174,6 @@ fun BlurImage(modifier: Modifier = Modifier) {
                 Text(text = "Blur Picture")
             }
         }
-    }
-}
-
-fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
-    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-        BitmapFactory.decodeStream(inputStream)
     }
 }
 
